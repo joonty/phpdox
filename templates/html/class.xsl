@@ -179,7 +179,16 @@
                     </p>                    
                 </xsl:for-each>
                 <xsl:if test="src:default">
-                    <p><b>Default:</b>&#160;<code><xsl:value-of select="src:default" /></code></p>
+                    <p><b>Default:</b>&#160;
+		    <xsl:choose>
+			    <xsl:when test="starts-with(src:default,'array')">
+				<pre><code><xsl:value-of select="src:default" /></code></pre>
+			    </xsl:when>
+			<xsl:otherwise>
+				<code><xsl:value-of select="src:default" /></code>
+			</xsl:otherwise>
+		    </xsl:choose>
+		    </p>
                 </xsl:if>
             </div>
             <hr />
@@ -200,37 +209,73 @@
                         <xsl:apply-templates select="src:description" />
                     </p>                    
                 </xsl:for-each>
+		 <xsl:if test="src:parameter">
+			<h4>Parameters</h4>
+			<ul class="method-parameters">
+				<xsl:apply-templates select="src:parameter[1]">
+					<xsl:with-param name="full" select="'1'" />
+				</xsl:apply-templates>
+			</ul>
+		</xsl:if>
             </section>
             <hr />
         </li>
     </xsl:template>    
     
     <xsl:template match="src:parameter">
-        <xsl:if test="@optional = 'true'">[</xsl:if>
-        <xsl:choose>
-            <xsl:when test="@type='object'">
-                <em><xsl:copy-of select="phe:classLink(.)" /></em>&#160;
-            </xsl:when>
-            <xsl:when test="@type='array'">
-                <em>Array</em>&#160;
-            </xsl:when>
-            <xsl:when test="@type='{unknown}'">
-                <xsl:variable name="name" select="@name" />
-                <xsl:for-each select="src:docblock/src:param[@name=$name]">
-                    <em><xsl:copy-of select="phe:classLink(.)" /></em>&#160;
-                </xsl:for-each>            
-            </xsl:when>            
-        </xsl:choose>
-        <strong>
-            <xsl:if test="@byreference = 'true'">&amp;</xsl:if>$<xsl:value-of select="@name" />
-        </strong>
-        <xsl:if test="src:default"><small> = <xsl:value-of select="src:default" /></small></xsl:if>
-        <xsl:if test="following-sibling::src:parameter">, <xsl:apply-templates select="following-sibling::src:parameter[1]" /></xsl:if>
-        <xsl:if test="@optional = 'true'">&#160;]</xsl:if>
+	<xsl:param name="full" select="'0'" />
+	<xsl:choose>
+		<xsl:when test="$full = '1'">
+			<li>
+		<xsl:choose>
+		    <xsl:when test="@type='object'">
+			<em><xsl:copy-of select="phe:classLink(.)" />&#160;</em>
+		    </xsl:when>
+		    <xsl:when test="@type='{unknown}'">
+			<xsl:variable name="name" select="@name" />
+			<xsl:for-each select="src:docblock/src:param[@name=$name]">
+			    <em><xsl:copy-of select="phe:classLink(.)" />&#160;</em>
+			</xsl:for-each>            
+		    </xsl:when>            
+		    <xsl:otherwise>
+			<em><xsl:value-of select="@type" />&#160;</em>
+		    </xsl:otherwise>
+		</xsl:choose>
+		<strong>
+		    <xsl:if test="@byreference = 'true'"></xsl:if>$<xsl:value-of select="@name" />
+		</strong>
+		<xsl:if test="src:default"><small><em> = <xsl:value-of select="src:default" /></em></small></xsl:if>
+		<!--<xsl:if test="@optional = 'true'"><span class="parameter-optional"> [optional]</span></xsl:if>-->
+		&#160;<xsl:value-of select="@description" />
+			</li>
+			<xsl:if test="following-sibling::src:parameter"><xsl:apply-templates select="following-sibling::src:parameter[1]"><xsl:with-param name="full" select="$full" /></xsl:apply-templates></xsl:if>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:if test="@optional = 'true'">[</xsl:if>
+			<xsl:choose>
+			    <xsl:when test="@type='object'">
+				<em><xsl:copy-of select="phe:classLink(.)" /></em>&#160;
+			    </xsl:when>
+			    <xsl:when test="@type='{unknown}'">
+				<xsl:variable name="name" select="@name" />
+				<xsl:for-each select="src:docblock/src:param[@name=$name]">
+				    <em><xsl:copy-of select="phe:classLink(.)" /></em>&#160;
+				</xsl:for-each>            
+			    </xsl:when>            
+			    <xsl:otherwise>
+				<em><xsl:value-of select="@type" /></em>&#160;
+			    </xsl:otherwise>
+			</xsl:choose>
+			<strong>
+			    <xsl:if test="@byreference = 'true'">&amp;</xsl:if>$<xsl:value-of select="@name" />
+			</strong>
+			<xsl:if test="src:default"><small> = <xsl:value-of select="src:default" /></small></xsl:if>
+				<xsl:if test="following-sibling::src:parameter">, <xsl:apply-templates select="following-sibling::src:parameter[1]"><xsl:with-param name="full" select="$full" /></xsl:apply-templates></xsl:if>
+			<xsl:if test="@optional = 'true'">&#160;]</xsl:if>
+		</xsl:otherwise>
+	</xsl:choose>
     </xsl:template>
 
-    <!--  ## shared ## -->
-    
     <xsl:template name="modifiers">
         <xsl:param name="ctx" />
         

@@ -200,6 +200,20 @@ namespace TheSeer\phpDox {
                 } else {
                     $paramNode->setAttribute('type', '{unknown}');
                 }
+		if ($docBlock) {
+			$paramList = $docBlock->getElementsByTagName('param');
+			$paramEl = $paramList->item($idx);
+			if ($paramEl) {
+				$descAttr = $paramEl->getAttribute('description');
+				if ($descAttr) {
+					$paramNode->setAttribute('description',$descAttr);
+				}
+				$typeAttr = $paramEl->getAttribute('type');
+				if ($typeAttr && strcasecmp($typeAttr,'type')) {
+					$paramNode->setAttribute('type',$typeAttr);
+				}
+			}
+		}
                 $paramNode->setAttribute('optional', $param->isOptional() ? 'true' : 'false');
                 $paramNode->setAttribute('byreference', $param->isPassedByReference() ? 'true' : 'false');
                 if ($param->isDefaultValueAvailable()) {
