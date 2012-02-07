@@ -290,7 +290,7 @@
 		    </xsl:otherwise>
 		</xsl:choose>
 		<strong>
-		    <xsl:if test="@byreference = 'true'"></xsl:if>$<xsl:value-of select="@name" />
+		    <xsl:if test="@byreference = 'true'"></xsl:if><xsl:value-of select="@name" />
 		</strong>
 		<xsl:if test="src:default"><small><em> = <xsl:value-of select="src:default" /></em></small></xsl:if>
 		<!--<xsl:if test="@optional = 'true'"><span class="parameter-optional"> [optional]</span></xsl:if>-->
@@ -315,7 +315,7 @@
 			    </xsl:otherwise>
 			</xsl:choose>
 			<strong>
-			    <xsl:if test="@byreference = 'true'">&amp;</xsl:if>$<xsl:value-of select="@name" />
+			    <xsl:if test="@byreference = 'true'">&amp;</xsl:if><xsl:value-of select="@name" />
 			</strong>
 			<xsl:if test="src:default"><small> = <xsl:value-of select="src:default" /></small></xsl:if>
 				<xsl:if test="following-sibling::src:parameter">, <xsl:apply-templates select="following-sibling::src:parameter[1]"><xsl:with-param name="full" select="$full" /></xsl:apply-templates></xsl:if>
